@@ -5,8 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Naam Jap Counter</title>
 
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Laila:wght@700&display=swap" rel="stylesheet"/>
+
+  <!-- Manifest for PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#fb923c" />
+
+  <!-- App Icon -->
+  <link rel="icon" href="icon-192.png" type="image/png"/>
 
   <style>
     body {
@@ -41,14 +51,14 @@
     <button id="settingsToggle" class="text-sm text-gray-500 hover:text-orange-600">⚙️ Naam बदलें</button>
 
     <div id="settingsSection" class="hidden space-y-2 pt-2">
-      <input id="naamInput" type="text" class="naam-font text-2xl text-center w-full p-2 border-b-2 border-orange-300 bg-transparent focus:outline-none" placeholder="अपना नाम लिखें"/>
+      <input id="naamInput" type="text" class="naam-font text-2xl text-center w-full p-2 border-b-2 border-orange-300 bg-transparent focus:outline-none" placeholder="अपना नाम"/>
       <button id="saveNaamButton" class="text-white bg-green-500 px-4 py-2 rounded-full hover:bg-green-600 transition">✅ Save Naam</button>
     </div>
 
     <button id="toggleHistory" class="text-sm text-gray-500 hover:text-blue-600">📘 Show History</button>
 
     <div id="historySection" class="hidden text-left max-h-40 overflow-y-auto text-sm bg-white/60 p-2 rounded-xl shadow-inner space-y-1">
-      <!-- History will appear here -->
+      <!-- History appears here -->
     </div>
 
     <div class="pt-2 space-y-1 text-xs text-gray-400">
@@ -58,6 +68,16 @@
     </div>
   </div>
 
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js')
+        .then(reg => console.log('✅ Service Worker registered:', reg.scope))
+        .catch(err => console.error('❌ SW registration failed:', err));
+    }
+  </script>
+
+  <!-- Naam Jap Script -->
   <script>
     const japButton = document.getElementById('japButton');
     const countDisplay = document.getElementById('countDisplay');
@@ -86,7 +106,7 @@
       updateEmoji();
       updateHistorySection();
 
-      // Store
+      // Store all
       localStorage.setItem('naamJapCount', count);
       localStorage.setItem('naamJapNaam', naam);
       localStorage.setItem('naamJapMalas', mala);
@@ -162,7 +182,6 @@
       }
     });
 
-    // Init
     window.onload = () => {
       count = parseInt(localStorage.getItem('naamJapCount')) || 0;
       naam = localStorage.getItem('naamJapNaam') || "श्री राधा";
