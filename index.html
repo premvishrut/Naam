@@ -45,7 +45,7 @@
       <input 
         id="naamInput"
         type="text"
-        value="राम"
+        value="श्री राधा"
         class="naam-font text-5xl font-bold text-center bg-transparent w-full text-orange-800 focus:outline-none"
       />
     </div>
@@ -78,10 +78,9 @@
 
     let count = 0;
 
-    // Load from storage
     function initializeApp() {
       count = parseInt(localStorage.getItem('naamJapCount')) || 0;
-      naamInput.value = localStorage.getItem('naamJapNaam') || "राम";
+      naamInput.value = localStorage.getItem('naamJapNaam') || "श्री राधा";
       updateCountDisplay();
       updateEmotion();
     }
@@ -107,9 +106,8 @@
         }, 200);
       }
 
-      // Optional celebration
       if (count === 108) {
-        alert("🎉 बधाई हो! आपने 108 बार नाम जपा है।");
+        alert("🎉 बधाई हो! आपने 108 बार श्री राधा नाम जपा है।");
       }
     }
 
