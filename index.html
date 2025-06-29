@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naam Jap Counter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Laila:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent; /* Removes blue tap highlight on mobile */
+        }
+        .naam-font {
+            font-family: 'Laila', sans-serif;
+        }
+        /* Custom focus style to keep it clean */
+        #naamInput:focus {
+            outline: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-orange-100 via-amber-100 to-yellow-100 min-h-screen flex items-center justify-center p-4">
+
+    <!-- Main Counter Card -->
+    <div class="w-full max-w-sm bg-white/70 backdrop-blur-sm rounded-3xl shadow-2xl shadow-orange-200/50 p-6 text-center space-y-6 transform transition-transform duration-500">
+        
+        <!-- Emotion Display -->
+        <div id="emotionDisplay" class="text-7xl transition-transform duration-500 ease-in-out">
+            <!-- Emoji will be inserted here by JS -->
+        </div>
+
+        <!-- Naam/Mantra Input -->
+        <div>
+            <input 
+                id="naamInput"
+                type="text"
+                value="श्री राधा"
+                class="naam-font text-5xl font-bold text-center bg-transparent w-full text-orange-800 focus:outline-none"
+            >
+        </div>
+        
+        <!-- Count Display -->
+        <div id="countDisplay" class="text-8xl font-black text-slate-700 tracking-tight" style="font-feature-settings: 'tnum';">
+            <!-- Count will be inserted here by JS -->
+        </div>
+
+        <!-- Jap Button -->
+        <div class="pt-4">
+            <button id="japButton" class="w-full py-4 text-2xl font-bold bg-orange-500 text-white rounded-full shadow-lg shadow-orange-500/50 hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-300 transform active:scale-95 transition-all duration-150 ease-in-out">
+                Jap
+            </button>
+        </div>
+
+        <!-- Reset Button -->
+        <div>
+            <button id="resetButton" class="text-sm font-medium text-gray-500 hover:text-orange-600 transition-colors">
+                Reset Count
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- DOM Element Selection ---
+        // Get all the interactive elements from the HTML
+        const countDisplay = document.getElementById('countDisplay');
+        const japButton = document.getElementById('japButton');
+        const resetButton = document.getElementById('resetButton');
+        const emotionDisplay = document.getElementById('emotionDisplay');
+        const naamInput = document.getElementById('naamInput');
+
+        // --- State Variables ---
+        // This is the memory of our app
+        let count = 0;
+
+        // --- Core Functions ---
+
+        /**
+         * Updates the emotion emoji based on the current count.
+         * This function defines the "emotional journey" of the counting.
+         */
+        function updateEmotion() {
+            let emoji = '🙏'; // Default/starting state: Prayer
+            let transformClass = 'scale-100';
+
+            if (count > 0 && count <= 10) {
+                emoji = '😊'; // Getting started: Gentle Smile
+            } else if (count > 10 && count <= 30) {
+                emoji = '🥰'; // Feeling the love: Smiling with Hearts
+            } else if (count > 30 && count <= 70) {
+                emoji = '😌'; // Deepening calm: Relieved Face
+            } else if (count > 70 && count <= 108) {
+                emoji = '✨'; // Feeling the glow: Sparkles
+            } else if (count > 108) {
+                emoji = '😇'; // Reached a state of bliss: Angelic
+            }
+
+            // Animate the emoji change
+            if (emotionDisplay.innerText !== emoji) {
+                emotionDisplay.classList.add('scale-0');
+                setTimeout(() => {
+                    emotionDisplay.innerText = emoji;
+                    emotionDisplay.classList.remove('scale-0');
+                }, 200);
+            }
+        }
+
+        /**
+         * Updates the count number on the screen.
+         * It ensures the number is always displayed correctly.
+         */
+        function updateCountDisplay() {
+            countDisplay.innerText = count;
+        }
+
+
+        // --- Event Listeners ---
+        // These connect user actions (like clicks) to our functions
+
+        // Action for the main 'Jap' button
+        japButton.addEventListener('click', () => {
+            count++; // Increment the count
+            updateCountDisplay(); // Update the number on screen
+            updateEmotion(); // Update the emoji
+        });
+
+        // Action for the 'Reset' button
+        resetButton.addEventListener('click', () => {
+            // We can add a confirmation here if needed, but for simplicity, we'll reset directly.
+            count = 0; // Reset count to zero
+            updateCountDisplay(); // Update the number on screen
+            updateEmotion(); // Reset the emoji to the starting one
+        });
+
+        // No event listener needed for the input, as its value is read on demand or can be used as is.
+        // It's a simple, direct-edit field.
+
+        // --- Initial Application State ---
+        // This code runs once when the page loads to set everything up.
+        function initializeApp() {
+            updateCountDisplay();
+            updateEmotion();
+        }
+
+        // Run the initialization function
+        initializeApp();
+    </script>
+
+</body>
+</html>
