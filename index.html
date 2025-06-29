@@ -5,18 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Naam Jap Counter</title>
 
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Laila:wght@700&display=swap" rel="stylesheet"/>
-
-  <!-- PWA Manifest -->
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#fb923c" />
-
-  <!-- App Icon -->
-  <link rel="icon" href="icon-192.png" type="image/png"/>
 
   <style>
     body {
@@ -26,110 +16,160 @@
     .naam-font {
       font-family: 'Laila', sans-serif;
     }
-    #naamInput:focus {
-      outline: none;
-      box-shadow: none;
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-orange-100 via-amber-100 to-yellow-100 min-h-screen flex items-center justify-center p-4">
+<body class="bg-gradient-to-br from-yellow-100 via-orange-100 to-pink-100 min-h-screen flex items-center justify-center p-4">
 
-  <!-- Main Card -->
-  <div class="w-full max-w-sm bg-white/70 backdrop-blur-sm rounded-3xl shadow-2xl shadow-orange-200/50 p-6 text-center space-y-6 transform transition-transform duration-500">
-    
-    <!-- Emoji Emotion -->
-    <div id="emotionDisplay" class="text-7xl transition-transform duration-500 ease-in-out"></div>
+  <div class="w-full max-w-sm bg-white/70 backdrop-blur-md rounded-3xl shadow-2xl p-6 text-center space-y-6 fade-in">
 
-    <!-- Naam Input -->
-    <div>
-      <input 
-        id="naamInput"
-        type="text"
-        value="श्री राधा"
-        class="naam-font text-5xl font-bold text-center bg-transparent w-full text-orange-800 focus:outline-none"
-      />
+    <div id="emotionDisplay" class="text-6xl">🙏</div>
+    <div id="naamDisplay" class="naam-font text-3xl text-orange-700 font-bold"></div>
+    <div id="countDisplay" class="text-5xl font-black text-gray-800"></div>
+    <div class="text-lg text-gray-600">📿 Total Malas: <span id="malaDisplay">0</span></div>
+
+    <button id="japButton" class="w-full py-4 text-2xl font-bold bg-orange-500 text-white rounded-full hover:bg-orange-600 active:scale-95 transition-all">
+      Jap
+    </button>
+
+    <button id="settingsToggle" class="text-sm text-gray-500 hover:text-orange-600">⚙️ Naam बदलें</button>
+
+    <div id="settingsSection" class="hidden space-y-2 pt-2">
+      <input id="naamInput" type="text" class="naam-font text-2xl text-center w-full p-2 border-b-2 border-orange-300 bg-transparent focus:outline-none" placeholder="अपना नाम लिखें"/>
+      <button id="saveNaamButton" class="text-white bg-green-500 px-4 py-2 rounded-full hover:bg-green-600 transition">✅ Save Naam</button>
     </div>
 
-    <!-- Count Display -->
-    <div id="countDisplay" class="text-8xl font-black text-slate-700 tracking-tight" style="font-feature-settings: 'tnum';"></div>
+    <button id="toggleHistory" class="text-sm text-gray-500 hover:text-blue-600">📘 Show History</button>
 
-    <!-- Jap Button -->
-    <div class="pt-4">
-      <button id="japButton" class="w-full py-4 text-2xl font-bold bg-orange-500 text-white rounded-full shadow-lg shadow-orange-500/50 hover:bg-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-300 transform active:scale-95 transition-all duration-150 ease-in-out">
-        Jap
-      </button>
+    <div id="historySection" class="hidden text-left max-h-40 overflow-y-auto text-sm bg-white/60 p-2 rounded-xl shadow-inner space-y-1">
+      <!-- History will appear here -->
     </div>
 
-    <!-- Reset Button -->
-    <div>
-      <button id="resetButton" class="text-sm font-medium text-gray-500 hover:text-orange-600 transition-colors">
-        Reset Count
-      </button>
+    <div class="pt-2 space-y-1 text-xs text-gray-400">
+      <button id="resetCount" class="hover:text-red-500">⟳ Reset Count</button> |
+      <button id="resetMala" class="hover:text-red-500">⟳ Reset Mala</button> |
+      <button id="clearHistory" class="hover:text-red-500">🗑️ Clear History</button>
     </div>
   </div>
 
-  <!-- JS -->
   <script>
-    const countDisplay = document.getElementById('countDisplay');
     const japButton = document.getElementById('japButton');
-    const resetButton = document.getElementById('resetButton');
+    const countDisplay = document.getElementById('countDisplay');
+    const malaDisplay = document.getElementById('malaDisplay');
     const emotionDisplay = document.getElementById('emotionDisplay');
+    const naamDisplay = document.getElementById('naamDisplay');
     const naamInput = document.getElementById('naamInput');
+    const saveNaamButton = document.getElementById('saveNaamButton');
+    const settingsToggle = document.getElementById('settingsToggle');
+    const settingsSection = document.getElementById('settingsSection');
+    const resetCount = document.getElementById('resetCount');
+    const resetMala = document.getElementById('resetMala');
+    const toggleHistory = document.getElementById('toggleHistory');
+    const historySection = document.getElementById('historySection');
+    const clearHistory = document.getElementById('clearHistory');
 
     let count = 0;
+    let mala = 0;
+    let naam = "श्री राधा";
+    let history = [];
 
-    function initializeApp() {
-      count = parseInt(localStorage.getItem('naamJapCount')) || 0;
-      naamInput.value = localStorage.getItem('naamJapNaam') || "श्री राधा";
-      updateCountDisplay();
-      updateEmotion();
-    }
+    function updateDisplays() {
+      countDisplay.textContent = count;
+      malaDisplay.textContent = mala;
+      naamDisplay.textContent = naam;
+      updateEmoji();
+      updateHistorySection();
 
-    function updateCountDisplay() {
-      countDisplay.innerText = count;
+      // Store
       localStorage.setItem('naamJapCount', count);
+      localStorage.setItem('naamJapNaam', naam);
+      localStorage.setItem('naamJapMalas', mala);
+      localStorage.setItem('naamJapHistory', JSON.stringify(history));
     }
 
-    function updateEmotion() {
+    function updateEmoji() {
       let emoji = '🙏';
-      if (count > 0 && count <= 10) emoji = '😊';
-      else if (count > 10 && count <= 30) emoji = '🥰';
-      else if (count > 30 && count <= 70) emoji = '😌';
-      else if (count > 70 && count <= 108) emoji = '✨';
-      else if (count > 108) emoji = '😇';
+      if (count <= 10) emoji = '😊';
+      else if (count <= 30) emoji = '🥰';
+      else if (count <= 70) emoji = '😌';
+      else if (count <= 108) emoji = '✨';
+      else emoji = '😇';
 
-      if (emotionDisplay.innerText !== emoji) {
-        emotionDisplay.classList.add('scale-0');
-        setTimeout(() => {
-          emotionDisplay.innerText = emoji;
-          emotionDisplay.classList.remove('scale-0');
-        }, 200);
-      }
+      emotionDisplay.textContent = emoji;
+    }
 
-      if (count === 108) {
-        alert("🎉 बधाई हो! आपने 108 बार श्री राधा नाम जपा है।");
-      }
+    function updateHistorySection() {
+      historySection.innerHTML = '';
+      history.slice().reverse().forEach(entry => {
+        const div = document.createElement('div');
+        div.textContent = `🕒 ${entry.time} – ${entry.naam}`;
+        historySection.appendChild(div);
+      });
     }
 
     japButton.addEventListener('click', () => {
+      navigator.vibrate(50);
       count++;
-      updateCountDisplay();
-      updateEmotion();
+      const now = new Date();
+      const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      history.push({ time: time, naam: naam });
+      if (count % 108 === 0) mala++;
+      updateDisplays();
     });
 
-    resetButton.addEventListener('click', () => {
-      if (confirm("क्या आप वाकई गिनती रीसेट करना चाहते हैं?")) {
-        count = 0;
-        updateCountDisplay();
-        updateEmotion();
+    saveNaamButton.addEventListener('click', () => {
+      const newNaam = naamInput.value.trim();
+      if (newNaam) {
+        naam = newNaam;
+        naamInput.value = '';
+        settingsSection.classList.add('hidden');
+        updateDisplays();
       }
     });
 
-    naamInput.addEventListener('input', () => {
-      localStorage.setItem('naamJapNaam', naamInput.value);
+    settingsToggle.addEventListener('click', () => {
+      settingsSection.classList.toggle('hidden');
     });
 
-    initializeApp();
+    toggleHistory.addEventListener('click', () => {
+      historySection.classList.toggle('hidden');
+    });
+
+    resetCount.addEventListener('click', () => {
+      if (confirm("गिनती रीसेट करें?")) {
+        count = 0;
+        updateDisplays();
+      }
+    });
+
+    resetMala.addEventListener('click', () => {
+      if (confirm("माला काउंट रीसेट करें?")) {
+        mala = 0;
+        updateDisplays();
+      }
+    });
+
+    clearHistory.addEventListener('click', () => {
+      if (confirm("सभी जप इतिहास हटाएं?")) {
+        history = [];
+        updateDisplays();
+      }
+    });
+
+    // Init
+    window.onload = () => {
+      count = parseInt(localStorage.getItem('naamJapCount')) || 0;
+      naam = localStorage.getItem('naamJapNaam') || "श्री राधा";
+      mala = parseInt(localStorage.getItem('naamJapMalas')) || 0;
+      history = JSON.parse(localStorage.getItem('naamJapHistory')) || [];
+      updateDisplays();
+    };
   </script>
 
 </body>
